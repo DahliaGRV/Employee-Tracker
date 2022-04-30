@@ -1,7 +1,12 @@
-const mysql = require('mysq2');
+const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const express = require('express');
 
-const db = mysql.creatConnection(
+const app = express();
+
+const PORT = process.env.PORT || 2020;
+
+const db = mysql.createConnection(
     {
         host:'localhost',
         user:'root',
@@ -79,3 +84,8 @@ const employeeID = ()=>{
         })
     })
 }
+app.listen(PORT,()=>{
+    console.log(`We are a go at port ${PORT}`)
+});
+menu();
+
