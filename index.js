@@ -2,6 +2,7 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const express = require('express');
 const res = require('express/lib/response');
+const consoletable = require('console.table');
 
 const app = express();
 
@@ -29,15 +30,15 @@ function menu() {
             choices:['View All Employees','Add Employee','Update Employee Role','View All Roles','Add Role','View All Departments','Add Department','Find ID','Delete Something','Exit']
         }
     ]).then (res =>{
-        if(res.menu === 'View Employees'){
+        if(res.menu === 'View All Employees'){
             viewEmployees();
         }else if (res.menu==='Add Employee'){
             addEmployee();
         }else if (res.menu==='Update Employee Role'){
-            //TODO:add this function below
+            //TODO:add this function below-typed below, need to test.
             updateEmployeeRole();
         }else if (res.menu==='View All Roles'){
-            //TODO: add this function below
+            //TODO: add this function below-added.
             viewRoles();
         }else if (res.menu==='Add Role'){
             //TODO: add this function below
@@ -60,7 +61,6 @@ function menu() {
 const viewEmployees =()=>{
     db.query(`SELECT * FROM employees`, function(err,results){
         console.log(results);
-        res.json(err);
         menu();
     })
 }
@@ -92,10 +92,39 @@ const addEmployee =()=> {
         db.query(`INSERT INTO employees (first_name, last_name, employeed) VALUES (?,?,?)`[res.first,rest.last,employed],(err,data=>{
             console.log(data);
             menu();
-            res.json(err);
         }))
     })
 };
+
+const updateEmployeeRole =()=>{
+    inquirer.prompt([
+        // Need to figure out how to display the employee table info for choices, first attempt below. Not tested.
+        {
+            type:'list',
+            name:'employee',
+            message:"Which employee's role do you want to update?",
+            choices:[db.query(`SELECT first_name FROM employees`)]
+        },{
+            type:'list',
+            name:'role',
+            message:'Which role do you want to assign the selected employee?',
+            choices:[db.query(`SELECT title FROM role`)]
+        }
+    
+    ]).then(res =>{
+        db.query(`UPDATE role SET role =(?,?)`[res.employee,res.role],(err,data=>{
+            console.log(data);
+            menu();
+        }))
+    })
+};
+
+const viewRoles =()=>{
+    db.query(`SELECT * FROM role`, function(err,results){
+        console.log(results);
+        menu();
+    })
+}
 // If find ID is selected, this function will ask the user to prove the employee name to look up their id ->
 // Will need to add something to check if it exists or not
 const employeeID = ()=>{
@@ -109,7 +138,7 @@ const employeeID = ()=>{
         db.query(`SELECT id FROM students WHERE first_name = ?`, res.first_name,(err,data)=>{
             console.log(data);
             menu();
-            res.json(err);
+            throw err;
         })
     })
 };

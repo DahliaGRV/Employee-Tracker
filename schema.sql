@@ -8,6 +8,7 @@ CREATE TABLE department(
     name VARCHAR(30) NOT NULL
 );
 
+-- TODO: Add a way to pull manager ids from this table
 CREATE TABLE role(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) NOT NULL,
