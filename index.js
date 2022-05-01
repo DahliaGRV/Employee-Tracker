@@ -181,7 +181,6 @@ const employeeID = ()=>{
         db.query(`SELECT id FROM students WHERE first_name = ?`, res.first_name,(err,data)=>{
             console.log(data);
             menu();
-            throw err;
         })
     })
 };
@@ -210,7 +209,59 @@ const deleteSomething = ()=>{
         }else process.exit()
     })
 
-    }
+    };
+const deleteDepartment=()=>{
+    inquirer.prompt([
+        {
+            type:'list',
+            name:'department',
+            message:'Which department would you like to delete?',
+            choices:[db.query(`SELECT name FROM department`)]
+        }
+    ]).then(res=>{
+        db.query(`DELETE FROM department WHERE id =?`,res.department,(err,data)=>{
+            console.log(data);
+            console.log("Department was deleted from Database");
+            menu();
+        })
+    })
+};
+
+const deleteRole=()=>{
+    inquirer.prompt([
+        {
+            type:'list',
+            name:'role',
+            message:'Which role would you like to delete?',
+            choices:[db.query`SELECT title FROM role`]
+        }
+    ]).then (res=>{
+        db.query(`DELETE FROM department WHERE id =?`,res.role,(err,data)=>{
+            console.log(data);
+            console.log("Role was deleted from Database")
+            menu();
+        })
+    })
+
+}
+
+const deleteEmployee=()=>{
+    inquirer.prompt([
+        {
+            type:'list',
+            name:'employee',
+            message:'Which employee would you like to delete?',
+            choices:[db.query`SELECT first_name FROM employees`]
+        }
+    ]).then(res=>{
+        db.query(`DELETE FROM employess WHERE id=?`,res.employee,(err,data)=>{
+            console.log(data);
+            console.log("Employee was deleted from database");
+            menu();
+        })
+    })
+
+};
 
 menu();
 
