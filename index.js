@@ -1,14 +1,8 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const express = require('express');
-const res = require('express/lib/response');
 const consoletable = require('console.table');
 
-const app = express();
 
-
-// Assigns a port address for this app
-const PORT = process.env.PORT || 2020;
 
 // Connects this js to sql database
 const db = mysql.createConnection(
@@ -41,17 +35,18 @@ function menu() {
             //TODO: add this function below-added.
             viewRoles();
         }else if (res.menu==='Add Role'){
-            //TODO: add this function below
+            //TODO: add this function below-added.
             addRole();
         }else if (res.menu==='View All Departments'){
-            //TODO: add this function below
+            //TODO: add this function below-added.
             viewDepartments();
         }else if (res.menu==='Add Department'){
-            //TODO: add this function below
+            //TODO: add this function below-added.
             addDepartment();
         }else if(res.menu === 'Find ID'){
             employeeID();
         }else if(res.menu === 'Delete Something'){
+            // Need to add the follow up functions for deleting each thing(role,employee,department)
             deleteSomething();
         }else process.exit();
     })
@@ -124,6 +119,54 @@ const viewRoles =()=>{
         console.log(results);
         menu();
     })
+};
+
+const addRole =()=>{
+    inquirer.prompt([
+        {
+            type:'input',
+            name:'role',
+            message:'What is the name of the role?'
+        },{
+            type:'number',
+            name:'salary',
+            message:'What is the salary of the role?'
+        },{
+            type:'list',
+            name:'department',
+            message:'Which department does the role belong to?',
+            choices:[db.query(`SELECT name FROM department`)]
+        }
+    ]).then(res =>{
+        db.query(`INSERT INTO role(title,salary,department_id) VALUES(?,?,?)`[res.role,res.salary,res.department],(err,data=>{
+            console.log(data);
+            console.log("New role added to database");
+            menu();
+        }))
+    })
+};
+
+const viewDepartments =()=>{
+    db.query(`SELECT * FROM department`,function(err,results){
+        console.log(results);
+        menu();
+    })
+}
+
+const addDepartment=()=>{
+    inquirer.prompt([
+        {
+            type:'input',
+            name:'name',
+            message:'What is the name of the department?'
+        }
+    ]).then (res=>{
+        db.query(`INSERT INTO department(name) VALUES(?)`[res.name],(err,data=>{
+            console.log(data);
+            console.log("New department added to database");
+            menu();
+        }))
+    })
 }
 // If find ID is selected, this function will ask the user to prove the employee name to look up their id ->
 // Will need to add something to check if it exists or not
@@ -168,9 +211,6 @@ const deleteSomething = ()=>{
     })
 
     }
-// listener for the app (it is showing up at the end of every current text, would like it to show either before or after)
-app.listen(PORT,()=>{
-    // console.log(`We are a go at port ${PORT}`)
-});
+
 menu();
 
