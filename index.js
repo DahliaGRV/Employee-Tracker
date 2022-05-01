@@ -26,7 +26,7 @@ function menu() {
         {
             type:'list',
             name:'menu',
-            choices:['View All Employees','Add Employee','Update Employee Role','View All Roles','Add Role','View All Departments','Add Department','Find ID','Exit']
+            choices:['View All Employees','Add Employee','Update Employee Role','View All Roles','Add Role','View All Departments','Add Department','Find ID','Delete Something','Exit']
         }
     ]).then (res =>{
         if(res.menu === 'View Employees'){
@@ -49,7 +49,9 @@ function menu() {
             //TODO: add this function below
             addDepartment();
         }else if(res.menu === 'Find ID'){
-            employeeID()
+            employeeID();
+        }else if(res.menu === 'Delete Something'){
+            deleteSomething();
         }else process.exit();
     })
 }
@@ -93,7 +95,7 @@ const addEmployee =()=> {
             res.json(err);
         }))
     })
-}
+};
 // If find ID is selected, this function will ask the user to prove the employee name to look up their id ->
 // Will need to add something to check if it exists or not
 const employeeID = ()=>{
@@ -110,7 +112,33 @@ const employeeID = ()=>{
             res.json(err);
         })
     })
-}
+};
+
+const deleteSomething = ()=>{
+    inquirer.prompt([
+        {
+            type:'list',
+            message:'What would you like to delete?',
+            name:'delete',
+            choices:['Delete a Department','Delete a Role','Delete an Employee','Exit']
+        }
+    ]).then (res =>{
+        if (res.deleteSomething === 'Delete a Department'){
+            // TODO:add this function below
+            deleteDepartment();
+
+        } else if(res.deleteSomething === 'Delete a Role'){
+             // TODO:add this function below
+            deleteRole();
+
+        }else if(res.deleteSomething === 'Deleta an Employee'){
+             // TODO:add this function below
+            deleteEmployee();
+
+        }else process.exit()
+    })
+
+    }
 // listener for the app (it is showing up at the end of every current text, would like it to show either before or after)
 app.listen(PORT,()=>{
     // console.log(`We are a go at port ${PORT}`)
