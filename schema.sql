@@ -8,13 +8,13 @@ CREATE TABLE department(
     name VARCHAR(30) NOT NULL
 );
 
--- TODO: Add a way to pull manager ids from this table
+-- TODO: Add a way to pull manager ids from this table both here and in query.sql
 CREATE TABLE role(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL,
     department_id INT,
-    FOREIGN KEY(department_id)
+    FOREIGN KEY(department)
     REFERENCES department(id)
     ON DELETE SET NULL
 );
@@ -24,8 +24,8 @@ CREATE TABLE employees(
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL, 
     role_id INT,
-    -- manager_id INT,
-    FOREIGN KEY(role_id)
+    manager_id INT,
+    FOREIGN KEY(role)
     REFERENCES role(id)
 
 );

@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-// const console = require('console.table');
+const console = require('console.table');
 const express = require('express');
 
 
@@ -13,7 +13,7 @@ const db = mysql.createConnection(
         password:'Hannah1291',
         database:'employeelist_db'
     },
-    console.log('Connected to the employeelist_db database.')
+    // console.log('Connected to the employeelist_db database.')
 );
 
 // First menu with options for going forward
