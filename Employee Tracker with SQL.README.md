@@ -10,6 +10,9 @@
 
 ## Description
 This project keeps track of employee data.
+## Screenshots
+![image](https://user-images.githubusercontent.com/98775943/166412252-d300db8d-6d24-47e7-abc4-98a94ee86ff6.png)
+![image](https://user-images.githubusercontent.com/98775943/166412291-e14e0dcb-b397-4f65-a403-f9ee7ff85e9d.png)
 
 ## Installation
 System install requirements are Inquirer through npm, console.table package through npm, and mysql2 package as well. These can be installed by using the node installation feature under 'node npm install' followed by the name of the packages. It is also required that the user updates their username/ password information for SQL in the index.js file under the const db for creating the connection.
