@@ -1,15 +1,10 @@
-INSERT INTO employees(first_name,last_name)
-VALUES ("John","Doe"),
-        ("Mike","Chan"),
-        ("Ashley","Rodriguez"),
-        ("Kevin","Tupik");
+
 
 INSERT INTO department(name)
 VALUES ("Sales"),
         ("Engineering"),
         ("Finance"),
         ("Legal");
-
 INSERT INTO role(title, salary, department_id)
 VALUES ("Sales Lead",100000,1),
         ("Salesperson",80000,1),
@@ -19,3 +14,9 @@ VALUES ("Sales Lead",100000,1),
         ("Accountant",125000,3),
         ("Legal Team Lead",250000,4),
         ("Lawyer",190000,4);
+
+INSERT INTO employees(first_name,last_name,role_id)
+VALUES ("John","Doe",1),
+        ("Mike","Chan",7),
+        ("Ashley","Rodriguez",5),
+        ("Kevin","Tupik",6);

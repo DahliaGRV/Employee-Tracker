@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const console = require('console.table');
+const cTable = require('console.table');
 const express = require('express');
 
 
@@ -55,14 +55,25 @@ function menu() {
 
 // If showEmployees is selected, this function selects everything within employee table
 const viewEmployees =()=>{
-    db.query(`SELECT * FROM employees`, function(err,results){
-        console.log(results);
+    const join = "SELECT e.id, e.first_name, e.last_name,e.manager_id, salary, title, department_id, name AS department FROM employees e LEFT JOIN role ON e.role_id = role.id LEFT JOIN department ON role.department_id = department.id"
+    db.query(join, function(err,results){
+        if(err){
+            throw err;
+        }
+        console.table(results);
         menu();
     })
+
 }
 
 // If add employee is selected, this function will allow the user to answer a series of questions to generate a new employee
 const addEmployee =()=> {
+    // (db.query`SELECT CONCAT(A.first_name, ' ', A.last_name)FROM employees`,(err,res)=>{
+    //     if(err){
+    //         throw err;
+    //     }
+    //     console.log(res);
+    // })
     inquirer.prompt([
         {
             type:'input',
@@ -72,24 +83,71 @@ const addEmployee =()=> {
             type:'input',
             message:'Last name',
             name:'last'
-        },{
-            type:'list',
-            message:'Are they an employee?',
-            choices:['Yes','No'],
-            name:'employed',
         }
     ]).then(res =>{
-        var employed;
-        if(res.employed === 'Yes'){
-            employed = true
-        }else {
-            employed = false
-        }
-        db.query(`INSERT INTO employees (first_name, last_name, employeed) VALUES (?,?,?)`[res.first,rest.last,employed],(err,data=>{
-            console.log(data);
-            menu();
-        }))
+        const newEmployeeFirst = res.first;
+        const newEmployeeLast = res.last;
+        db.promise().query(`SELECT * FROM role`).then(([rows])=>{
+            const roles = rows.map(row=>({
+                name:row.title,
+                id:row.id
+            }))
+            inquirer.prompt([
+                {
+            type:'list',
+            message:"What is this employee's role?",
+            name:'employee_role',
+            choices: roles
+            }
+            ]).then(ans =>{
+                const newEmployeeRole = roles.filter(role=>role.name === ans.employee_role)[0];
+                db.promise().query(`SELECT * FROM employees `).then(([columns])=>{
+                    const getManagers = columns =>columns.manager_id === null
+                    const managers = columns.filter(getManagers).map(manager=>({
+                        name:`${manager.first_name} ${manager.last_name}`,
+                        id:manager.id
+                    }))
+                    inquirer.prompt([
+                        {
+                            type:'list',
+                            name:'employee_manager',
+                            message:"Who is this employee's manager?",
+                            choices: [...managers,'None']
+                        }
+                    ]).then(fin =>{
+                        if(fin.employee_manager === 'None'){
+                            db.query(`INSERT INTO employees(first_name,last_name,role_id,manager_id) VALUES (?,?,?,?) `,[newEmployeeFirst,newEmployeeLast,newEmployeeRole.id,null],(err,data)=>{
+                                if(err){
+                                   throw err;
+                                } else{
+                                    console.log('new employee added');
+                                    menu();
+                                }
+                            })
+                        } else{
+                            const newEmployeeManager = managers.filter(manager=>manager.name === fin.employee_manager)[0];
+                            db.query(`INSERT INTO employees(first_name,last_name,role_id,manager_id) VALUES (?,?,?,?) `,[newEmployeeFirst,newEmployeeLast,newEmployeeRole.id,newEmployeeManager.id],(err,data)=>{
+                                if(err){
+                                   throw err;
+                                } else{
+                                    console.log('New employee added to database');
+                                    menu();
+                                }
+                            })
+                          
+                        } 
+                       
+                    })
+                })
+            })
+        })
+    
     })
+
+
+    // db.query(`INSERT INTO employees (first_name, last_name) VALUES (?,?)`[res.first,res.last],(err,data=>{
+    //     console.log(data);
+    // }))
 };
 
 const updateEmployeeRole =()=>{
@@ -99,7 +157,7 @@ const updateEmployeeRole =()=>{
             type:'list',
             name:'employee',
             message:"Which employee's role do you want to update?",
-            choices:[db.query(`SELECT first_name FROM employees`)]
+            choices:[db.query(`SELECT CONCAT(first_name, ' ',last_name) FROM employees`)]
         },{
             type:'list',
             name:'role',
@@ -116,10 +174,14 @@ const updateEmployeeRole =()=>{
 };
 
 const viewRoles =()=>{
-    db.query(`SELECT * FROM role`, function(err,results){
-        console.log(results);
-        menu();
+    const join = "SELECT role.id, title, salary, department.name AS department_name FROM department INNER JOIN role WHERE  department.id = role.department_id"
+    db.query(join, function(err,results){
+        if(err){
+            throw err;
+        }
+        console.table(results);
     })
+    menu();
 };
 
 const addRole =()=>{
@@ -234,7 +296,7 @@ const deleteRole=()=>{
             type:'list',
             name:'role',
             message:'Which role would you like to delete?',
-            choices:[db.query`SELECT title FROM role`]
+            choices:[db.query`SELECT title FROM role`,(err,data)]
         }
     ]).then (res=>{
         db.query(`DELETE FROM department WHERE id =?`,res.role,(err,data)=>{
