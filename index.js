@@ -68,12 +68,7 @@ const viewEmployees =()=>{
 
 // If add employee is selected, this function will allow the user to answer a series of questions to generate a new employee
 const addEmployee =()=> {
-    // (db.query`SELECT CONCAT(A.first_name, ' ', A.last_name)FROM employees`,(err,res)=>{
-    //     if(err){
-    //         throw err;
-    //     }
-    //     console.log(res);
-    // })
+
     inquirer.prompt([
         {
             type:'input',
@@ -143,36 +138,50 @@ const addEmployee =()=> {
         })
     
     })
-
-
-    // db.query(`INSERT INTO employees (first_name, last_name) VALUES (?,?)`[res.first,res.last],(err,data=>{
-    //     console.log(data);
-    // }))
 };
 
 const updateEmployeeRole =()=>{
-    inquirer.prompt([
-        // Need to figure out how to display the employee table info for choices, first attempt below. Not tested.
-        {
-            type:'list',
-            name:'employee',
-            message:"Which employee's role do you want to update?",
-            choices:[db.query(`SELECT CONCAT(first_name, ' ',last_name) FROM employees`)]
-        },{
-            type:'list',
-            name:'role',
-            message:'Which role do you want to assign the selected employee?',
-            choices:[db.query(`SELECT title FROM role`)]
-        }
-    
-    ]).then(res =>{
-        db.query(`UPDATE role SET role =(?,?)`[res.employee,res.role],(err,data=>{
-            console.log(data);
-            menu();
+    db.promise().query(`SELECT * FROM employees`).then(([names])=>{
+        const employeeNames = names.map(getName=>({
+            name:`${getName.first_name} ${getName.last_name}`,
+            id:getName.id
         }))
+        inquirer.prompt([
+            {
+                type:'list',
+                name:'employee',
+                message:"Which employee's role do you want to update?",
+                choices: [...employeeNames]
+            }
+        ]).then(res =>{
+            const employeeToChange = employeeNames.filter(person=>person.name === res.employee)[0];
+            db.promise().query(`SELECT * FROM role`).then(([rows])=>{
+                const roles = rows.map(row=>({
+                    name:row.title,
+                    id:row.id
+                }))
+                inquirer.prompt([
+                    {
+                type:'list',
+                message:"What is this employee's role?",
+                name:'employee_role',
+                choices: roles
+                    }
+                ]).then(res =>{
+                const newEmployeeRole = roles.filter(role=>role.name === res.employee_role)[0];
+                db.query(`UPDATE employees SET role_id = ? WHERE employees.id = ?`,[newEmployeeRole.id,employeeToChange.id],(err,data)=>{
+                    if(err){
+                        throw err;}
+                    else{
+                        console.log("Employee updated in the database.")
+                        menu();
+                    }
+                })
+            })
+        })
     })
-};
-
+})}
+    
 const viewRoles =()=>{
     const join = "SELECT role.id, title, salary, department.name AS department_name FROM department INNER JOIN role WHERE  department.id = role.department_id"
     db.query(join, function(err,results){
@@ -248,83 +257,83 @@ const employeeID = ()=>{
     })
 };
 
-const deleteSomething = ()=>{
-    inquirer.prompt([
-        {
-            type:'list',
-            message:'What would you like to delete?',
-            name:'delete',
-            choices:['Delete a Department','Delete a Role','Delete an Employee','Exit']
-        }
-    ]).then (res =>{
-        if (res.deleteSomething === 'Delete a Department'){
-            // TODO:add this function below
-            deleteDepartment();
+// const deleteSomething = ()=>{
+//     inquirer.prompt([
+//         {
+//             type:'list',
+//             message:'What would you like to delete?',
+//             name:'delete',
+//             choices:['Delete a Department','Delete a Role','Delete an Employee','Exit']
+//         }
+//     ]).then (res =>{
+//         if (res.deleteSomething === 'Delete a Department'){
+//             // TODO:add this function below
+//             deleteDepartment();
 
-        } else if(res.deleteSomething === 'Delete a Role'){
-             // TODO:add this function below
-            deleteRole();
+//         } else if(res.deleteSomething === 'Delete a Role'){
+//              // TODO:add this function below
+//             deleteRole();
 
-        }else if(res.deleteSomething === 'Deleta an Employee'){
-             // TODO:add this function below
-            deleteEmployee();
+//         }else if(res.deleteSomething === 'Deleta an Employee'){
+//              // TODO:add this function below
+//             deleteEmployee();
 
-        }else process.exit()
-    })
+//         }else process.exit()
+//     })
 
-    };
-const deleteDepartment=()=>{
-    inquirer.prompt([
-        {
-            type:'list',
-            name:'department',
-            message:'Which department would you like to delete?',
-            choices:[db.query(`SELECT name FROM department`)]
-        }
-    ]).then(res=>{
-        db.query(`DELETE FROM department WHERE id =?`,res.department,(err,data)=>{
-            console.log(data);
-            console.log("Department was deleted from Database");
-            menu();
-        })
-    })
-};
+//     };
+// const deleteDepartment=()=>{
+//     inquirer.prompt([
+//         {
+//             type:'list',
+//             name:'department',
+//             message:'Which department would you like to delete?',
+//             choices:[db.query(`SELECT name FROM department`)]
+//         }
+//     ]).then(res=>{
+//         db.query(`DELETE FROM department WHERE id =?`,res.department,(err,data)=>{
+//             console.log(data);
+//             console.log("Department was deleted from Database");
+//             menu();
+//         })
+//     })
+// };
 
-const deleteRole=()=>{
-    inquirer.prompt([
-        {
-            type:'list',
-            name:'role',
-            message:'Which role would you like to delete?',
-            choices:[db.query`SELECT title FROM role`,(err,data)]
-        }
-    ]).then (res=>{
-        db.query(`DELETE FROM department WHERE id =?`,res.role,(err,data)=>{
-            console.log(data);
-            console.log("Role was deleted from Database")
-            menu();
-        })
-    })
+// const deleteRole=()=>{
+//     inquirer.prompt([
+//         {
+//             type:'list',
+//             name:'role',
+//             message:'Which role would you like to delete?',
+//             choices:[db.query`SELECT title FROM role`,(err,data)]
+//         }
+//     ]).then (res=>{
+//         db.query(`DELETE FROM department WHERE id =?`,res.role,(err,data)=>{
+//             console.log(data);
+//             console.log("Role was deleted from Database")
+//             menu();
+//         })
+//     })
 
-}
+// }
 
-const deleteEmployee=()=>{
-    inquirer.prompt([
-        {
-            type:'list',
-            name:'employee',
-            message:'Which employee would you like to delete?',
-            choices:[db.query`SELECT first_name FROM employees`]
-        }
-    ]).then(res=>{
-        db.query(`DELETE FROM employess WHERE id=?`,res.employee,(err,data)=>{
-            console.log(data);
-            console.log("Employee was deleted from database");
-            menu();
-        })
-    })
+// const deleteEmployee=()=>{
+//     inquirer.prompt([
+//         {
+//             type:'list',
+//             name:'employee',
+//             message:'Which employee would you like to delete?',
+//             choices:[db.query`SELECT first_name FROM employees`]
+//         }
+//     ]).then(res=>{
+//         db.query(`DELETE FROM employess WHERE id=?`,res.employee,(err,data)=>{
+//             console.log(data);
+//             console.log("Employee was deleted from database");
+//             menu();
+//         })
+//     })
 
-};
+// };
 
 menu();
 
