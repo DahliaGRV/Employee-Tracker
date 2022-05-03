@@ -15,7 +15,7 @@ This project keeps track of employee data.
 ![image](https://user-images.githubusercontent.com/98775943/166412291-e14e0dcb-b397-4f65-a403-f9ee7ff85e9d.png)
 
 ## Installation
-System install requirements are Inquirer through npm, console.table package through npm, and mysql2 package as well. These can be installed by using the node installation feature under 'node npm install' followed by the name of the packages. It is also required that the user updates their username/ password information for SQL in the index.js file under the const db for creating the connection.
+System install requirements are Inquirer through npm, console.table package through npm, and mysql2 package as well. These can be installed by using the node installation feature under 'node npm install' followed by the name of the packages. It is also required that the user updates their username/ password information for SQL in the index.js file under the const db for creating the connection. After updating the information, it's important that the user runs the schema.sql and seeds.sql files to accurately display the tables and example information.
 
 ## Usage
 This project can be used by management services to keep track of current employees, their roles, their departments, salaries, and managers. It allows a user to put it a new employee, update the employee. They can also add new roles or departments, as well as, update those fileds as well. 
