@@ -194,12 +194,17 @@ const viewRoles =()=>{
 };
 
 const addRole =()=>{
-    inquirer.prompt([
-        {
+    db.promise().query(`SELECT * FROM department`).then(([departments])=>{
+        const addDepartment = departments.map(row=>({
+            name:row.name,
+            id:row.id
+        }))
+        inquirer.prompt([
+            {
             type:'input',
             name:'role',
             message:'What is the name of the role?'
-        },{
+            },{
             type:'number',
             name:'salary',
             message:'What is the salary of the role?'
@@ -207,15 +212,20 @@ const addRole =()=>{
             type:'list',
             name:'department',
             message:'Which department does the role belong to?',
-            choices:[db.query(`SELECT name FROM department`)]
+            choices:[...addDepartment]
         }
     ]).then(res =>{
-        db.query(`INSERT INTO role(title,salary,department_id) VALUES(?,?,?)`[res.role,res.salary,res.department],(err,data=>{
-            console.log(data);
-            console.log("New role added to database");
-            menu();
-        }))
+        const departmentToAdd = addDepartment.filter(dep =>dep.name === res.department)[0];
+        db.query(`INSERT INTO role(title,salary,department_id) VALUES(?,?,?)`,[res.role,res.salary,departmentToAdd.id],(err,data)=>{
+            if(err){
+                throw err;
+            }else{
+                console.log("New role added to database");
+                menu();
+            }
+        })
     })
+})
 };
 
 const viewDepartments =()=>{
@@ -229,17 +239,19 @@ const addDepartment=()=>{
     inquirer.prompt([
         {
             type:'input',
-            name:'name',
+            name:'depName',
             message:'What is the name of the department?'
         }
     ]).then (res=>{
-        db.query(`INSERT INTO department(name) VALUES(?)`[res.name],(err,data=>{
-            console.log(data);
+        db.query(`INSERT INTO department(name) VALUES (?)`,[res.depName],(err,data)=>{
+            if(err){
+                throw err;
+            }else{
             console.log("New department added to database");
             menu();
-        }))
+        }})
     })
-}
+};
 // If find ID is selected, this function will ask the user to prove the employee name to look up their id ->
 // Will need to add something to check if it exists or not
 const employeeID = ()=>{
