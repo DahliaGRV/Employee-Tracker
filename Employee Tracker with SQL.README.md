@@ -36,7 +36,7 @@ This README is covered under license GPLv2
 * [GitHub Portfolio](https://github.com/DahliaGRV)
 
 * [Repository Link](https://github.com/DahliaGRV/Employee-Tracker)
-* [Deployed Link](chrome-extension://mmeijimgabbpbgpdklnllpncmdofkcpn/app.html#/files/86c3a9e6-156e-4c12-y3db-c4dc85923524)
+* [Deployed Link](https://drive.google.com/file/d/1ITr8dwa-u2wivCmn53E6wXSrp23ulGHw/view)(Video Link)
 
 ## Summary
 This exercise was the most challenging to date. The joins were very hard for me and I found the code a bit hard to follow because it was so lengthy and repitive. I definitely feel I was challenged and I try put my best foot forward & ended up learning alot.  
